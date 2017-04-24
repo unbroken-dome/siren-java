@@ -1,0 +1,30 @@
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'net.ltgt.apt'
+apply plugin: 'org.unbroken-dome.test-sets'
+apply plugin: 'maven-publish'
+
+
+testSets {
+    integrationTest { dirName = 'integration-test' }
+}
+
+
+dependencies {
+    compile project(':siren-core')
+    compile project(':siren-spring')
+    compile project(':siren-ap')
+
+    compileOnly 'com.google.auto.service:auto-service'
+    apt 'com.google.auto.service:auto-service'
+
+    testCompile 'com.github.javaparser:javaparser-core'
+    testCompile 'com.google.testing.compile:compile-testing'
+    testCompile 'org.springframework:spring-test'
+    testCompile 'org.slf4j:slf4j-api'
+    testRuntime 'ch.qos.logback:logback-classic'
+
+    integrationTestCompile 'org.springframework:spring-webmvc'
+    integrationTestCompileOnly 'com.google.auto.service:auto-service'
+}

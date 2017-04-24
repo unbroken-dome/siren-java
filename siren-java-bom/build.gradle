@@ -1,0 +1,23 @@
+apply plugin: 'maven-publish'
+
+
+publishing {
+    publications {
+        mavenPom(MavenPublication) {
+
+            pom.withXml() {
+                def dependencyManagement = asNode().appendNode('dependencyManagement')
+                def dependencies = dependencyManagement.appendNode('dependencies')
+
+                for (p in rootProject.subprojects.findAll { it.name != project.name }) {
+                    p.plugins.withType(MavenPublishPlugin) {
+                        def dependency = dependencies.appendNode('dependency')
+                        dependency.appendNode 'groupId', p.group
+                        dependency.appendNode 'artifactId', p.name
+                        dependency.appendNode 'version', p.version
+                    }
+                }
+            }
+        }
+    }
+}

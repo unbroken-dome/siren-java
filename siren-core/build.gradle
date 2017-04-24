@@ -1,0 +1,7 @@
+apply plugin: 'java-library'
+apply plugin: 'maven-publish'
+
+
+dependencies {
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+}

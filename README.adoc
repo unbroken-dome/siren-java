@@ -1,0 +1,194 @@
+= siren-java
+
+[NOTE]
+====
+This is work in progress - use at your own risk. Feedback, issue reports and contributions are welcome.
+====
+
+This library aids in creating https://github.com/kevinswiber/siren[Siren]-compatible Web APIs,
+particularly when building REST controllers with the
+https://projects.spring.io/spring-framework/[Spring Web MVC] framework.
+
+It provides a set of core classes and builders that model the various elements of the Siren
+specification, as well as an annotation processor that generates methods for inserting
+links and actions based on Spring controllers.
+
+
+== Why not Spring HATEOAS?
+
+The https://projects.spring.io/spring-hateoas/[Spring HATEOAS] project follows a similar goal, and will include some
+sort of support for Siren eventually (it currently only supports HAL).
+
+The main difference is that instead of generating code using an annotation processor, Spring HATEOAS derives
+information about links and actions ("affordances") at runtime. It does so by making an intercepted call to the
+controller method, and using the values of the passed arguments (similar to how mocking frameworks work). This
+approach works well enough for HAL, which has a much simpler model, but shows several shortcomings and lack of
+flexibility when applied to Siren.
+
+
+== Including the library
+
+Declare a dependency on the `siren-core` and (optionally) `siren-spring` JARs in your build tool:
+
+.Gradle
+[source,groovy]
+----
+dependencies {
+    compile 'org.unbrokendome.siren:siren-core:0.1'
+    compile 'org.unbrokendome.siren:siren-spring:0.1
+}
+----
+
+.Maven
+[source,xml]
+----
+<dependencies>
+    <dependency>
+        <groupId>org.unbrokendome.siren</groupId>
+        <artifactId>siren-core</artifactId>
+        <version>0.1</version>
+    </dependency>
+    <dependency>
+        <groupId>org.unbrokendome.siren</groupId>
+        <artifactId>siren-spring</artifactId>
+        <version>0.1</version>
+    </dependency>
+</dependencies>
+----
+
+There is also a bill-of-materials (BOM) artefact named `siren-java-bom` which you can refer to when using Maven, or
+Gradle with a compatible plugin like
+https://github.com/spring-gradle-plugins/dependency-management-plugin[io.spring.dependency-management].
+
+
+== Using the Siren Model and Builder
+
+The `siren-core` library includes a number of classes that model the various Siren elements. The root entity is
+represented by the class `RootEntity`, which you should return by a Siren-compliant Spring controller method.
+The following example constructs the example "order" entity that is listed in Siren JSON format in the
+Siren spec:
+
+[source,java]
+----
+@RestController
+@RequestMapping(value = "/order", produces = "application/vnd.siren+json")
+public class OrderController {
+
+    @GetMapping("/{id}")
+    public RootEntity getOrder(@PathVariable String id) {
+        return RootEntity.builder()
+                .setClassName("order")
+                .addProperty("orderNumber", 42)
+                .addProperty("itemCount", 3)
+                .addProperty("status", "pending")
+                .addEmbeddedLink("http://x.io/rels/order-items", link -> link
+                        .setClassNames("items", "collection")
+                        .setHref("http://api.x.io/orders/42/items"))
+                .addEmbeddedEntity("http://x.io/rels/customer", entity -> entity
+                        .setClassNames("info", "customer")
+                        .addProperty("customerId", "pj123")
+                        .addProperty("name", "Peter Joseph")
+                        .addLink("self", link -> link.setHref("http://api.x.io/customers/pj123")))
+                .addAction("add-item", action -> action
+                        .setTitle("Add Item")
+                        .setMethod("POST")
+                        .setHref("http://api.x.io/orders/42/items")
+                        .setType("application/x-www-form-urlencoded")
+                        .addField("orderNumber", field -> field
+                                .setType(ActionField.Type.HIDDEN)
+                                .setValue(42))
+                        .addField("productCode", field -> field
+                                .setType(ActionField.Type.TEXT))
+                        .addField("quantity", field -> field
+                                .setType(ActionField.Type.NUMBER)))
+                .addLink("self", link -> link.setHref("http://api.x.io/orders/42"))
+                .addLink("previous", link -> link.setHref("http://api.x.io/orders/41"))
+                .addLink("next", link -> link.setHref("http://api.x.io/orders/43"))
+                .build();
+    }
+}
+----
+
+Using the builders should be quite straightforward. The only thing of note is the use of `Consumer<T>` lambdas as
+arguments to the `add...` methods. For example, the method `addLink` takes the link `rel` (which is mandatory) and
+a lambda to act on a `LinkBuilder`:
+
+[source,java]
+----
+public RootEntityBuilder addLink(String rel, Consumer<LinkBuilder> spec);
+----
+
+This pattern is used throughout the various builder classes. It reduces boilerplate code (we don't need to construct
+a `LinkBuilder`, act on it, and call `build()` in the end, and it enables us to keep the fluent style with
+arbitrarily nested structures (which would not be possible without lambdas).
+
+
+== Using the Annotation Processor
+
+The annotation processor for Spring Web is available in the artefact `siren-spring-ap`. For Gradle, it is recommended
+to use the https://plugins.gradle.org/plugin/net.ltgt.apt[`net.ltgt.apt`] plugin:
+
+.Gradle
+[source,groovy]
+----
+plugins {
+    id 'net.ltgt.apt' version '0.10'
+}
+
+dependencies {
+    compile 'org.unbrokendome.siren:siren-core:0.1'
+    compile 'org.unbrokendome.siren:siren-spring:0.1'
+    apt 'org.unbrokendome.siren:siren-spring-ap:0.1'
+}
+----
+
+
+The annotation processor generates a `<ControllerName>Links` class and/or a `<ControllerName>Actions` class for every
+annotated Spring controller. These helper classes contain static methods for each `@RequestMapping`-annotated method in
+your controller, which you can use wherever you would use a `Customer<ActionBuilder>` or `Consumer<LinkBuilder>`:
+
+[source,java]
+----
+@RequestMapping(value = "/", produces = "application/vnd.siren+json")
+public class HomeController {
+
+    @GetMapping
+    public RootEntity home() {
+        return RootEntity.builder()
+            // The HomeControllerLinks.home() method is generated by the annotation processor
+            // and returns a Consumer<LinkBuilder>
+            .addLink("self", HomeControllerLinks.home())
+            .build();
+    }
+}
+----
+
+There is a lot of logic behind how controller methods are mapped to actions or links, some of which can be fine-tuned
+by special annotations. More documentation will follow soon.
+
+As a rule of thumb, links are created for `GET` mappings, and actions for other HTTP methods. Parameters to the
+controller method are either mapped to action fields (for actions), or must be given to the ControllerLinks method
+(for links).
+
+
+=== Using the Siren Annotation Processor with `kapt` in Kotlin Projects
+
+Kotlin uses its own annotation processor called
+https://blog.jetbrains.com/kotlin/2015/05/kapt-annotation-processing-for-kotlin/[kapt], and the Siren annotation
+processor should be compatible with it. In your Gradle script, use the
+https://plugins.gradle.org/plugin/org.jetbrains.kotlin.kapt[org.jetbrains.kotlin.kapt] Gradle plugin and declare the
+annotation processor as a `kapt` dependency:
+
+.Gradle
+[source,groovy]
+----
+plugins {
+    id 'org.jetbrains.kotlin.kapt' version '1.1.1'
+}
+
+dependencies {
+    compile 'org.unbrokendome.siren:siren-core:0.1'
+    compile 'org.unbrokendome.siren:siren-spring:0.1'
+    kapt 'org.unbrokendome.siren:siren-spring-ap:0.1'
+}
+----

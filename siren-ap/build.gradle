@@ -1,0 +1,19 @@
+apply plugin: 'java-library'
+apply plugin: 'groovy'
+apply plugin: 'net.ltgt.apt'
+apply plugin: 'maven-publish'
+
+
+dependencies {
+    compileOnly project(':siren-core')
+
+    compile 'com.squareup:javapoet'
+
+    compile 'com.google.guava:guava'
+
+    compile 'com.google.inject:guice'
+    compile 'com.google.inject.extensions:guice-multibindings'
+
+    compileOnly 'com.google.auto.service:auto-service'
+    apt 'com.google.auto.service:auto-service'
+}

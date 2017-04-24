@@ -1,0 +1,15 @@
+apply plugin: 'java-library'
+apply plugin: 'maven-publish'
+
+
+dependencies {
+    api project(':siren-core')
+    api 'javax.servlet:javax.servlet-api'
+
+    api 'org.springframework:spring-context'
+    api 'org.springframework:spring-web'
+
+    implementation 'org.springframework:spring-webmvc'
+
+    compileOnly 'com.google.code.findbugs:jsr305'
+}
