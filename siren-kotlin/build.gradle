@@ -1,7 +1,0 @@
-apply plugin: 'nebula.kotlin'
-apply plugin: 'java-library'
-apply plugin: 'maven-publish'
-
-dependencies {
-    api project(':siren-core')
-}
