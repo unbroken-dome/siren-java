@@ -4,6 +4,7 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'net.ltgt.apt'
 apply plugin: 'org.unbroken-dome.test-sets'
 apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
 
 
 testSets {

@@ -2,6 +2,7 @@ apply plugin: 'java-library'
 apply plugin: 'maven-publish'
 apply plugin: 'org.jetbrains.kotlin.jvm'
 apply plugin: 'nebula.optional-base'
+apply plugin: 'com.jfrog.bintray'
 
 
 dependencies {

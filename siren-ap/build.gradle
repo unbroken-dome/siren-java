@@ -2,6 +2,7 @@ apply plugin: 'java-library'
 apply plugin: 'groovy'
 apply plugin: 'net.ltgt.apt'
 apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
 
 
 dependencies {

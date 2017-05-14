@@ -4,8 +4,3 @@ if (!gradle.startParameter.taskNames.contains('release')) {
 }
 
 allprojects { version = rootProject.version }
-
-task release {
-    group = PublishingPlugin.PUBLISH_TASK_GROUP
-    doLast { println "Releasing $version" }
-}

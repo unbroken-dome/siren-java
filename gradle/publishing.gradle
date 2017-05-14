@@ -1,3 +1,8 @@
+task release {
+    group = PublishingPlugin.PUBLISH_TASK_GROUP
+    doLast { println "Releasing $version" }
+}
+
 plugins.withId('maven-publish') {
 
     plugins.withId('java') {
@@ -43,7 +48,39 @@ plugins.withId('maven-publish') {
                 }
             }
         }
+
+        plugins.withId('com.jfrog.bintray') {
+            bintray.publications = ['mavenJava']
+        }
     }
-    
-    rootProject.tasks['release'].dependsOn tasks.publish
+}
+
+project.plugins.withId('com.jfrog.bintray') {
+    bintray {
+        user = project.bintray_user
+        key = project.bintray_key
+
+        dryRun = Boolean.valueOf(project.bintray_dryrun as String)
+
+        pkg {
+            repo = project.bintray_repo
+            name = project.name
+            desc = project.description
+            websiteUrl = project.home_url
+            licenses = ['MIT']
+            labels = project.bintray_labels.split(',')
+
+            vcsUrl = project.scm_url
+            issueTrackerUrl = project.issues_url
+            publicDownloadNumbers = true
+        }
+
+        pkg.version {
+            name = project.version
+            released = new Date()
+            vcsTag = project.version
+        }
+    }
+
+    tasks['release'].dependsOn tasks.bintrayUpload
 }
