@@ -23,7 +23,7 @@ public class BuilderMethodCodeGenerator<T extends AffordanceTemplate> {
 
     private final T affordanceTemplate;
     private final String methodName;
-    private final Type builderType;
+    private final Type specType;
     private final List<BuilderMethodContributor> contributors;
 
 
@@ -31,11 +31,11 @@ public class BuilderMethodCodeGenerator<T extends AffordanceTemplate> {
     public BuilderMethodCodeGenerator(
             T affordanceTemplate,
             String methodName,
-            Type builderType,
+            Type specType,
             Collection<? extends BuilderMethodContributor> contributors) {
         this.affordanceTemplate = affordanceTemplate;
         this.methodName = methodName;
-        this.builderType = builderType;
+        this.specType = specType;
 
         this.contributors = contributors.stream()
                 .filter(c -> c.appliesTo(affordanceTemplate))
@@ -47,7 +47,7 @@ public class BuilderMethodCodeGenerator<T extends AffordanceTemplate> {
     public MethodSpec generate() {
         return MethodSpec.methodBuilder(methodName)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .returns(ParameterizedTypeName.get(Consumer.class, builderType))
+                .returns(specType)
                 .addParameters(generateParameters())
                 .addCode(generateCodeBefore())
                 .addCode(generateReturnCodeBlock())

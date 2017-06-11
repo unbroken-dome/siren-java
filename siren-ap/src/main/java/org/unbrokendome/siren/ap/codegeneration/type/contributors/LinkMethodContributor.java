@@ -7,6 +7,7 @@ import org.unbrokendome.siren.ap.model.affordance.AffordanceTemplate;
 import org.unbrokendome.siren.ap.model.affordance.grouping.AffordanceGroup;
 import org.unbrokendome.siren.ap.model.affordance.grouping.AffordanceGroupKind;
 import org.unbrokendome.siren.model.LinkBuilder;
+import org.unbrokendome.siren.model.LinkSpec;
 
 import javax.inject.Inject;
 import java.lang.reflect.Type;
@@ -23,8 +24,8 @@ public class LinkMethodContributor extends AbstractTypeSpecMethodContributor {
 
 
     @Override
-    protected Type getBuilderTypeForAffordance(AffordanceTemplate affordance) {
-        return LinkBuilder.class;
+    protected Type getSpecTypeForAffordance(AffordanceTemplate affordance) {
+        return LinkSpec.class;
     }
 
 

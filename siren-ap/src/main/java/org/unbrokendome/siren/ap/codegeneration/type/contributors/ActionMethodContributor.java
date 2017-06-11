@@ -7,6 +7,7 @@ import org.unbrokendome.siren.ap.model.affordance.AffordanceTemplate;
 import org.unbrokendome.siren.ap.model.affordance.grouping.AffordanceGroup;
 import org.unbrokendome.siren.ap.model.affordance.grouping.AffordanceGroupKind;
 import org.unbrokendome.siren.model.ActionBuilder;
+import org.unbrokendome.siren.model.ActionSpec;
 
 import javax.inject.Inject;
 import java.lang.reflect.Type;
@@ -23,8 +24,8 @@ public class ActionMethodContributor extends AbstractTypeSpecMethodContributor {
 
 
     @Override
-    protected Type getBuilderTypeForAffordance(AffordanceTemplate affordance) {
-        return ActionBuilder.class;
+    protected Type getSpecTypeForAffordance(AffordanceTemplate affordance) {
+        return ActionSpec.class;
     }
 
 

@@ -27,10 +27,10 @@ public abstract class AbstractTypeSpecMethodContributor implements TypeSpecContr
         for (AffordanceTemplate affordanceTemplate : affordanceGroup.getAffordanceTemplates()) {
 
             String methodName = getMethodNameForAffordance(affordanceTemplate);
-            Type builderType = getBuilderTypeForAffordance(affordanceTemplate);
+            Type specType = getSpecTypeForAffordance(affordanceTemplate);
 
             MethodSpec methodSpec =
-                    new BuilderMethodCodeGenerator<>(affordanceTemplate, methodName, builderType, methodContributors)
+                    new BuilderMethodCodeGenerator<>(affordanceTemplate, methodName, specType, methodContributors)
                             .generate();
 
             typeSpec.addMethod(methodSpec);
@@ -43,6 +43,6 @@ public abstract class AbstractTypeSpecMethodContributor implements TypeSpecContr
     }
 
 
-    protected abstract Type getBuilderTypeForAffordance(AffordanceTemplate affordance);
+    protected abstract Type getSpecTypeForAffordance(AffordanceTemplate affordance);
 
 }
