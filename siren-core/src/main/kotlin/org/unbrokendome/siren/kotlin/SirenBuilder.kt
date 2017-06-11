@@ -81,10 +81,10 @@ abstract class FullEntityBuilderKt<T : FullEntity, B : FullEntityBuilder<T, B>>
 protected constructor(builder: B)
     : EntityBuilderKt<T, B>(builder) {
 
-    fun property(name: String, value: Any) =
+    fun property(name: String, value: Any?) =
             builder.addProperty(name, value)
 
-    fun properties(value: Map<String, Any>) =
+    fun properties(value: Map<String, *>) =
             builder.addProperties(value)
 
     fun embeddedEntity(rel: String, spec: Consumer<EmbeddedEntityBuilder>) {
