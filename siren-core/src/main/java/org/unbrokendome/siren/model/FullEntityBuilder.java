@@ -17,7 +17,7 @@ public abstract class FullEntityBuilder<T extends FullEntity, B extends FullEnti
 
 
     @Nonnull
-    public final B addProperty(String name, Object value) {
+    public final B addProperty(String name, @Nullable Object value) {
         if (properties != null) {
             throw new IllegalStateException("Cannot use map-style properties when a properties object has been set");
         }
@@ -45,7 +45,7 @@ public abstract class FullEntityBuilder<T extends FullEntity, B extends FullEnti
 
 
     @Nonnull
-    public final B setProperties(Object properties) {
+    public final B setProperties(@Nullable Object properties) {
         if (propertiesMap != null) {
             throw new IllegalStateException("Cannot use object-style properties when a property map entry has been added");
         }
