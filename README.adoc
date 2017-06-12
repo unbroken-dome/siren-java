@@ -34,8 +34,8 @@ Declare a dependency on the `siren-core` and (optionally) `siren-spring` JARs in
 [source,groovy]
 ----
 dependencies {
-    compile 'org.unbrokendome.siren:siren-core:0.1.1'
-    compile 'org.unbrokendome.siren:siren-spring:0.1.1
+    compile 'org.unbrokendome.siren:siren-core:0.1.2'
+    compile 'org.unbrokendome.siren:siren-spring:0.1.2
 }
 ----
 
@@ -46,12 +46,12 @@ dependencies {
     <dependency>
         <groupId>org.unbrokendome.siren</groupId>
         <artifactId>siren-core</artifactId>
-        <version>0.1.1</version>
+        <version>0.1.2</version>
     </dependency>
     <dependency>
         <groupId>org.unbrokendome.siren</groupId>
         <artifactId>siren-spring</artifactId>
-        <version>0.1.1</version>
+        <version>0.1.2</version>
     </dependency>
 </dependencies>
 ----
@@ -136,9 +136,9 @@ plugins {
 }
 
 dependencies {
-    compile 'org.unbrokendome.siren:siren-core:0.1.1'
-    compile 'org.unbrokendome.siren:siren-spring:0.1.1'
-    apt 'org.unbrokendome.siren:siren-spring-ap:0.1.1'
+    compile 'org.unbrokendome.siren:siren-core:0.1.2'
+    compile 'org.unbrokendome.siren:siren-spring:0.1.2'
+    apt 'org.unbrokendome.siren:siren-spring-ap:0.1.2'
 }
 ----
 
@@ -187,8 +187,8 @@ plugins {
 }
 
 dependencies {
-    compile 'org.unbrokendome.siren:siren-core:0.1.1'
-    compile 'org.unbrokendome.siren:siren-spring:0.1.1'
-    kapt 'org.unbrokendome.siren:siren-spring-ap:0.1.1'
+    compile 'org.unbrokendome.siren:siren-core:0.1.2'
+    compile 'org.unbrokendome.siren:siren-spring:0.1.2'
+    kapt 'org.unbrokendome.siren:siren-spring-ap:0.1.2'
 }
 ----
