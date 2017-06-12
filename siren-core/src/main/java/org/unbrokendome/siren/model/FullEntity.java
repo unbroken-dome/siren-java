@@ -1,6 +1,7 @@
 package org.unbrokendome.siren.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -9,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 
 
+@JsonPropertyOrder({ "classes", "title", "properties", "entities", "links", "actions" })
 public abstract class FullEntity extends Entity {
 
     private final Object properties;

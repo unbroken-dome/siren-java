@@ -1,5 +1,7 @@
 package org.unbrokendome.siren.model;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
@@ -7,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 
 
+@JsonPropertyOrder({ "rel", "class", "title", "href", "type" })
 public final class Link extends Reference {
 
     private final List<String> rel;

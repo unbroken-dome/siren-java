@@ -1,6 +1,7 @@
 package org.unbrokendome.siren.model;
 
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import javax.annotation.Nonnull;
@@ -11,6 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 
 
+@JsonPropertyOrder({ "name", "type", "class", "title", "value" })
 public final class ActionField extends Element {
 
     private final String name;
@@ -96,7 +98,7 @@ public final class ActionField extends Element {
 
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         return obj instanceof ActionField && equals((ActionField) obj);
     }
 
