@@ -34,8 +34,8 @@ Declare a dependency on the `siren-core` and (optionally) `siren-spring` JARs in
 [source,groovy]
 ----
 dependencies {
-    compile 'org.unbrokendome.siren:siren-core:0.1.2'
-    compile 'org.unbrokendome.siren:siren-spring:0.1.2
+    compile 'org.unbrokendome.siren:siren-core:0.1.3'
+    compile 'org.unbrokendome.siren:siren-spring:0.1.3
 }
 ----
 
