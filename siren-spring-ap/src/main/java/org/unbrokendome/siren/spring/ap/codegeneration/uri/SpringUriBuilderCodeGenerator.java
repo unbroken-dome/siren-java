@@ -1,6 +1,8 @@
 package org.unbrokendome.siren.spring.ap.codegeneration.uri;
 
 import com.squareup.javapoet.CodeBlock;
+import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.unbrokendome.siren.ap.codegeneration.uri.UriBuilderCodeGenerator;
 import org.unbrokendome.siren.spring.RequestUtils;
 
@@ -19,6 +21,15 @@ public class SpringUriBuilderCodeGenerator implements UriBuilderCodeGenerator {
     public static SpringUriBuilderCodeGenerator fromCurrentRequest() {
         CodeBlock.Builder codeBlock = CodeBlock.builder()
                 .add("$T.createUriBuilderFromCurrentRequest()\n", RequestUtils.class)
+                .indent().indent();
+        return new SpringUriBuilderCodeGenerator(codeBlock);
+    }
+
+
+    public static SpringUriBuilderCodeGenerator fromRequestVariable(String requestVariable) {
+        CodeBlock.Builder codeBlock = CodeBlock.builder()
+                .add("$T.fromHttpRequest(new $T($L))\n",
+                        UriComponentsBuilder.class, ServletServerHttpRequest.class, requestVariable)
                 .indent().indent();
         return new SpringUriBuilderCodeGenerator(codeBlock);
     }

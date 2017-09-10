@@ -1,9 +1,11 @@
 package org.unbrokendome.siren.ap.codegeneration.method.contributors;
 
+import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
+import org.unbrokendome.siren.ap.codegeneration.CodeGenerationContext;
 import org.unbrokendome.siren.ap.codegeneration.uri.UriBuilderCodeGenerator;
 import org.unbrokendome.siren.ap.codegeneration.uri.UriBuilderCodeGeneratorFactory;
 import org.unbrokendome.siren.ap.model.affordance.AffordanceTemplate;
@@ -23,6 +25,7 @@ public abstract class AbstractHrefBuilderMethodContributor<T extends AffordanceT
 
     private static final String HREF_VARIABLE_NAME = "href";
     private static final String URIVARIABLES_VARIABLE_NAME = "uriVariables";
+    private static final String CURRENT_REQUEST_PARAMETER_NAME = "request";
 
     private final UriBuilderCodeGeneratorFactory uriBuilderCodeGeneratorFactory;
 
@@ -34,10 +37,28 @@ public abstract class AbstractHrefBuilderMethodContributor<T extends AffordanceT
 
     @Override
     @Nonnull
-    protected final Stream<ParameterSpec> doGenerateMethodParameters(T affordanceTemplate) {
+    protected final Stream<ParameterSpec> doGenerateMethodParameters(T affordanceTemplate,
+                                                                     CodeGenerationContext context) {
+        Stream<ParameterSpec> forCurrentRequest;
+        if (context == CodeGenerationContext.EXPLICIT_REQUEST) {
+            forCurrentRequest = createMethodParameterForCurrentRequest();
+        } else {
+            forCurrentRequest = Stream.empty();
+        }
+
         return Stream.concat(
-                createMethodParametersForRequestParameters(affordanceTemplate.getPathParameters()),
+                Stream.concat(forCurrentRequest,
+                        createMethodParametersForRequestParameters(affordanceTemplate.getPathParameters())),
                 generateAdditionalMethodParameters(affordanceTemplate));
+    }
+
+
+    private Stream<ParameterSpec> createMethodParameterForCurrentRequest() {
+        ParameterSpec parameter = ParameterSpec.builder(
+                ClassName.get("javax.servlet.http", "HttpServletRequest"),
+                CURRENT_REQUEST_PARAMETER_NAME)
+                .build();
+        return Stream.of(parameter);
     }
 
 
@@ -63,10 +84,10 @@ public abstract class AbstractHrefBuilderMethodContributor<T extends AffordanceT
 
     @Override
     @Nonnull
-    protected final CodeBlock doGenerateCodeBefore(T affordanceTemplate) {
+    protected final CodeBlock doGenerateCodeBefore(T affordanceTemplate, CodeGenerationContext context) {
         return CodeBlock.builder()
                 .add(constructCodeForUriVariablesMap(affordanceTemplate))
-                .add(constructHrefCodeBlock(affordanceTemplate))
+                .add(constructHrefCodeBlock(affordanceTemplate, context))
                 .build();
     }
 
@@ -103,10 +124,14 @@ public abstract class AbstractHrefBuilderMethodContributor<T extends AffordanceT
 
 
     @Nonnull
-    private CodeBlock constructHrefCodeBlock(T affordanceTemplate) {
+    private CodeBlock constructHrefCodeBlock(T affordanceTemplate, CodeGenerationContext context) {
 
-        UriBuilderCodeGenerator uriBuilderCodeGenerator =
-                uriBuilderCodeGeneratorFactory.fromCurrentRequest();
+        UriBuilderCodeGenerator uriBuilderCodeGenerator;
+        if (context == CodeGenerationContext.EXPLICIT_REQUEST) {
+            uriBuilderCodeGenerator = uriBuilderCodeGeneratorFactory.fromRequestVariable(CURRENT_REQUEST_PARAMETER_NAME);
+        } else {
+            uriBuilderCodeGenerator = uriBuilderCodeGeneratorFactory.fromCurrentRequest();
+        }
 
         if (!affordanceTemplate.getPathSegments().isEmpty()) {
             affordanceTemplate.getPathSegments()

@@ -18,6 +18,7 @@ import spock.mock.DetachedMockFactory
 import spock.mock.MockFactory
 import spock.mock.MockingApi
 
+import javax.servlet.http.HttpServletRequest
 import java.util.function.Consumer
 
 
@@ -40,14 +41,18 @@ trait RequestContextTest {
     void currentRequest(HttpMethod httpMethod, String url,
                         Consumer<MockHttpServletRequestBuilder> config = null) {
 
+        def request = createRequest(httpMethod, url, config)
+        def requestAttributes = new ServletRequestAttributes(request)
+        RequestContextHolder.setRequestAttributes(requestAttributes)
+    }
+
+    HttpServletRequest createRequest(HttpMethod httpMethod, String url,
+                                     Consumer<MockHttpServletRequestBuilder> config = null) {
         def builder = MockMvcRequestBuilders.request(httpMethod, URI.create(url))
                 .requestAttr(DispatcherServlet.WEB_APPLICATION_CONTEXT_ATTRIBUTE, applicationContext)
         if (config != null) {
             config.accept(builder)
         }
-
-        def request = builder.buildRequest(servletContext)
-        def requestAttributes = new ServletRequestAttributes(request)
-        RequestContextHolder.setRequestAttributes(requestAttributes)
+        return builder.buildRequest(servletContext)
     }
 }

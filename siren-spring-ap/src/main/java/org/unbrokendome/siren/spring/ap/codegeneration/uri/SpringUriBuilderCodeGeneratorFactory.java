@@ -10,4 +10,10 @@ public class SpringUriBuilderCodeGeneratorFactory implements UriBuilderCodeGener
     public UriBuilderCodeGenerator fromCurrentRequest() {
         return SpringUriBuilderCodeGenerator.fromCurrentRequest();
     }
+
+
+    @Override
+    public UriBuilderCodeGenerator fromRequestVariable(String requestVariable) {
+        return SpringUriBuilderCodeGenerator.fromRequestVariable(requestVariable);
+    }
 }

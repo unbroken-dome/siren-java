@@ -1,5 +1,6 @@
 package org.unbrokendome.siren.ap.codegeneration.type.contributors;
 
+import org.unbrokendome.siren.ap.codegeneration.CodeGenerationContext;
 import org.unbrokendome.siren.ap.codegeneration.method.BuilderMethodCodeGenerator;
 import org.unbrokendome.siren.ap.codegeneration.method.BuilderMethodContributor;
 import org.unbrokendome.siren.ap.codegeneration.type.TypeSpecContributor;
@@ -26,15 +27,21 @@ public abstract class AbstractTypeSpecMethodContributor implements TypeSpecContr
     public final void contribute(AffordanceGroup affordanceGroup, TypeSpec.Builder typeSpec) {
         for (AffordanceTemplate affordanceTemplate : affordanceGroup.getAffordanceTemplates()) {
 
+            CodeGenerationContext context = getCodeGenerationContext();
             String methodName = getMethodNameForAffordance(affordanceTemplate);
             Type specType = getSpecTypeForAffordance(affordanceTemplate);
 
-            MethodSpec methodSpec =
-                    new BuilderMethodCodeGenerator<>(affordanceTemplate, methodName, specType, methodContributors)
-                            .generate();
+            BuilderMethodCodeGenerator<AffordanceTemplate> generator = new BuilderMethodCodeGenerator<>(
+                    affordanceTemplate, context, methodName, specType, methodContributors);
+            MethodSpec methodSpec = generator.generate();
 
             typeSpec.addMethod(methodSpec);
         }
+    }
+
+
+    protected CodeGenerationContext getCodeGenerationContext() {
+        return CodeGenerationContext.DEFAULT;
     }
 
 

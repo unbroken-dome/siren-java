@@ -1,5 +1,6 @@
 package org.unbrokendome.siren.ap.codegeneration.method;
 
+import org.unbrokendome.siren.ap.codegeneration.CodeGenerationContext;
 import org.unbrokendome.siren.ap.model.affordance.AffordanceTemplate;
 import com.google.common.collect.Ordering;
 import com.squareup.javapoet.CodeBlock;
@@ -22,6 +23,7 @@ public class BuilderMethodCodeGenerator<T extends AffordanceTemplate> {
     private static final String BUILDER_VAR_NAME = "b";
 
     private final T affordanceTemplate;
+    private final CodeGenerationContext context;
     private final String methodName;
     private final Type specType;
     private final List<BuilderMethodContributor> contributors;
@@ -30,15 +32,17 @@ public class BuilderMethodCodeGenerator<T extends AffordanceTemplate> {
     @SuppressWarnings("unchecked")
     public BuilderMethodCodeGenerator(
             T affordanceTemplate,
+            CodeGenerationContext context,
             String methodName,
             Type specType,
             Collection<? extends BuilderMethodContributor> contributors) {
         this.affordanceTemplate = affordanceTemplate;
+        this.context = context;
         this.methodName = methodName;
         this.specType = specType;
 
         this.contributors = contributors.stream()
-                .filter(c -> c.appliesTo(affordanceTemplate))
+                .filter(c -> c.appliesTo(affordanceTemplate, context))
                 .collect(Collectors.toList());
     }
 
@@ -58,8 +62,7 @@ public class BuilderMethodCodeGenerator<T extends AffordanceTemplate> {
     @Nonnull
     private Iterable<ParameterSpec> generateParameters() {
         return contributors.stream()
-                .flatMap(c -> c.generateMethodParameters(affordanceTemplate))
-                .sorted(parameterOrdering())
+                .flatMap(c -> c.generateMethodParameters(affordanceTemplate, context))
                 .collect(Collectors.toList());
     }
 
@@ -68,7 +71,7 @@ public class BuilderMethodCodeGenerator<T extends AffordanceTemplate> {
     private CodeBlock generateCodeBefore() {
         CodeBlock.Builder codeBlock = CodeBlock.builder();
         contributors.stream()
-                .map(c -> c.generateCodeBefore(affordanceTemplate))
+                .map(c -> c.generateCodeBefore(affordanceTemplate, context))
                 .filter(code -> code != null && !code.isEmpty())
                 .forEach(codeBlock::add);
         return codeBlock.build();
@@ -81,7 +84,7 @@ public class BuilderMethodCodeGenerator<T extends AffordanceTemplate> {
                 .add("$[return $1L -> $1L", BUILDER_VAR_NAME)
                 .indent().indent();
         contributors.stream()
-                .map(c -> c.generateBuilderSetterStatement(affordanceTemplate, BUILDER_VAR_NAME))
+                .map(c -> c.generateBuilderSetterStatement(affordanceTemplate, context, BUILDER_VAR_NAME))
                 .filter(code -> code != null && !code.isEmpty())
                 .forEach(code -> returnCodeBlock.add("\n").add(code));
         returnCodeBlock.add(";\n$]")

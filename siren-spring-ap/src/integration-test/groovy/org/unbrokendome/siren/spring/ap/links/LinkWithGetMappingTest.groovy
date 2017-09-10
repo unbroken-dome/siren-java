@@ -50,4 +50,19 @@ class LinkWithGetMappingTest extends Specification implements CompilerTest, Requ
         then:
             link.href == 'http://api.example.com/'
     }
+
+
+    def "Should generate link for controller method with explicit request parameter"() {
+        given:
+            def HomeControllerLinks = assumeClassPresent('example.HomeControllerLinks')
+        and:
+            def request = createRequest(HttpMethod.GET, 'http://api.example.com/')
+
+        when:
+            Consumer<LinkBuilder> linkSpec = HomeControllerLinks.home(request)
+            def link = new LinkBuilder('self').with(linkSpec).build()
+
+        then:
+            link.href == 'http://api.example.com/'
+    }
 }
