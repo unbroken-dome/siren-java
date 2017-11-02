@@ -4,6 +4,7 @@ import com.google.auto.service.AutoService;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.TypeSpec;
+import org.unbrokendome.siren.ap.codegeneration.CodeGenerationContext;
 import org.unbrokendome.siren.ap.codegeneration.title.ResolvableTitleSupplierGenerator;
 import org.unbrokendome.siren.ap.codegeneration.title.TitleCodeGenerationUtils;
 import org.unbrokendome.siren.ap.codegeneration.type.TypeSpecContributor;
@@ -14,6 +15,7 @@ import org.unbrokendome.siren.ap.model.affordance.grouping.AffordanceGroupKind;
 import org.unbrokendome.siren.ap.model.affordance.link.LinkTemplate;
 import org.unbrokendome.siren.titles.LinkTitleLookup;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.lang.model.element.Modifier;
 import java.util.Map;
@@ -33,7 +35,8 @@ public class LinkTitleLookupFieldContributor implements TypeSpecContributor {
 
 
     @Override
-    public void contribute(AffordanceGroup affordanceGroup, TypeSpec.Builder typeSpec) {
+    public void contribute(AffordanceGroup affordanceGroup, CodeGenerationContext context,
+                           TypeSpec.Builder typeSpec) {
         for (AffordanceTemplate affordanceTemplate : affordanceGroup.getAffordanceTemplates()) {
             LinkTemplate linkTemplate = (LinkTemplate) affordanceTemplate;
             if (linkTemplate.hasTitleMap() || linkTemplate.hasResolvableTitles()) {
@@ -58,7 +61,8 @@ public class LinkTitleLookupFieldContributor implements TypeSpecContributor {
     }
 
 
-    private CodeBlock buildTitleLookupInitializer(AffordanceTitle defaultTitle, Map<String, AffordanceTitle> titleMap) {
+    private CodeBlock buildTitleLookupInitializer(@Nullable AffordanceTitle defaultTitle,
+                                                  Map<String, AffordanceTitle> titleMap) {
         CodeBlock.Builder expression = CodeBlock.builder()
                 .add("$T.builder()\n", LinkTitleLookup.class)
                 .indent().indent();
@@ -90,7 +94,7 @@ public class LinkTitleLookupFieldContributor implements TypeSpecContributor {
 
 
     @Override
-    public boolean appliesTo(AffordanceGroup affordanceGroup) {
+    public boolean appliesTo(AffordanceGroup affordanceGroup, CodeGenerationContext context) {
         return affordanceGroup.getKind() == AffordanceGroupKind.LINK;
     }
 }

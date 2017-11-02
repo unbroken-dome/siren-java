@@ -1,6 +1,5 @@
 package org.unbrokendome.siren.ap.codegeneration.method.contributors;
 
-import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
@@ -11,7 +10,6 @@ import org.unbrokendome.siren.ap.codegeneration.uri.UriBuilderCodeGeneratorFacto
 import org.unbrokendome.siren.ap.model.affordance.AffordanceTemplate;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
 import java.util.Collections;
@@ -25,7 +23,6 @@ public abstract class AbstractHrefBuilderMethodContributor<T extends AffordanceT
 
     private static final String HREF_VARIABLE_NAME = "href";
     private static final String URIVARIABLES_VARIABLE_NAME = "uriVariables";
-    private static final String CURRENT_REQUEST_PARAMETER_NAME = "request";
 
     private final UriBuilderCodeGeneratorFactory uriBuilderCodeGeneratorFactory;
 
@@ -36,11 +33,19 @@ public abstract class AbstractHrefBuilderMethodContributor<T extends AffordanceT
 
 
     @Override
+    protected boolean appliesTo(CodeGenerationContext context, BuilderMethodMode mode) {
+        return mode == BuilderMethodMode.EXPLICIT_REQUEST
+                || uriBuilderCodeGeneratorFactory.supportsFromCurrentRequest();
+    }
+
+
+    @Override
     @Nonnull
     protected final Stream<ParameterSpec> doGenerateMethodParameters(T affordanceTemplate,
-                                                                     CodeGenerationContext context) {
+                                                                     CodeGenerationContext context,
+                                                                     BuilderMethodMode mode) {
         Stream<ParameterSpec> forCurrentRequest;
-        if (context == CodeGenerationContext.EXPLICIT_REQUEST) {
+        if (mode == BuilderMethodMode.EXPLICIT_REQUEST) {
             forCurrentRequest = createMethodParameterForCurrentRequest();
         } else {
             forCurrentRequest = Stream.empty();
@@ -55,8 +60,8 @@ public abstract class AbstractHrefBuilderMethodContributor<T extends AffordanceT
 
     private Stream<ParameterSpec> createMethodParameterForCurrentRequest() {
         ParameterSpec parameter = ParameterSpec.builder(
-                ClassName.get("javax.servlet.http", "HttpServletRequest"),
-                CURRENT_REQUEST_PARAMETER_NAME)
+                uriBuilderCodeGeneratorFactory.getRequestVariableType(),
+                uriBuilderCodeGeneratorFactory.getRequestVariableName())
                 .build();
         return Stream.of(parameter);
     }
@@ -84,10 +89,11 @@ public abstract class AbstractHrefBuilderMethodContributor<T extends AffordanceT
 
     @Override
     @Nonnull
-    protected final CodeBlock doGenerateCodeBefore(T affordanceTemplate, CodeGenerationContext context) {
+    protected final CodeBlock doGenerateCodeBefore(T affordanceTemplate, CodeGenerationContext context,
+                                                   BuilderMethodMode mode) {
         return CodeBlock.builder()
                 .add(constructCodeForUriVariablesMap(affordanceTemplate))
-                .add(constructHrefCodeBlock(affordanceTemplate, context))
+                .add(constructHrefCodeBlock(affordanceTemplate, mode))
                 .build();
     }
 
@@ -124,11 +130,12 @@ public abstract class AbstractHrefBuilderMethodContributor<T extends AffordanceT
 
 
     @Nonnull
-    private CodeBlock constructHrefCodeBlock(T affordanceTemplate, CodeGenerationContext context) {
+    private CodeBlock constructHrefCodeBlock(T affordanceTemplate, BuilderMethodMode mode) {
 
         UriBuilderCodeGenerator uriBuilderCodeGenerator;
-        if (context == CodeGenerationContext.EXPLICIT_REQUEST) {
-            uriBuilderCodeGenerator = uriBuilderCodeGeneratorFactory.fromRequestVariable(CURRENT_REQUEST_PARAMETER_NAME);
+        if (mode == BuilderMethodMode.EXPLICIT_REQUEST) {
+            String requestVariableName = uriBuilderCodeGeneratorFactory.getRequestVariableName();
+            uriBuilderCodeGenerator = uriBuilderCodeGeneratorFactory.fromRequestVariable(requestVariableName);
         } else {
             uriBuilderCodeGenerator = uriBuilderCodeGeneratorFactory.fromCurrentRequest();
         }
@@ -159,7 +166,6 @@ public abstract class AbstractHrefBuilderMethodContributor<T extends AffordanceT
 
 
     @Override
-    @Nullable
     protected final CodeBlock doGenerateBuilderSetterStatement(T affordanceTemplate, String builderVariableName) {
         return CodeBlock.builder()
                 .add(".setHref($L)", HREF_VARIABLE_NAME)

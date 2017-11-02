@@ -157,8 +157,8 @@ class SirenBuilderTest {
         }
 
         assertEquals(RootEntity.builder()
-                .addEmbeddedEntity("item") { entity ->
-                    entity.title = "item 1"
+                .addEmbeddedEntity("item") { e ->
+                    e.title = "item 1"
                 }
                 .build(),
                 entity)

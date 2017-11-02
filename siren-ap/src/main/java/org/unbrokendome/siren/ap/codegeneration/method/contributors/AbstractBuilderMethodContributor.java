@@ -20,13 +20,14 @@ public abstract class AbstractBuilderMethodContributor<T extends AffordanceTempl
 
 
     @Override
-    public final boolean appliesTo(AffordanceTemplate affordanceTemplate, CodeGenerationContext context) {
+    public final boolean appliesTo(AffordanceTemplate affordanceTemplate, CodeGenerationContext context,
+                                   BuilderMethodMode mode) {
         return getTargetTemplateType().isInstance(affordanceTemplate)
-                && appliesTo(context);
+                && appliesTo(context, mode);
     }
 
 
-    protected boolean appliesTo(CodeGenerationContext context) {
+    protected boolean appliesTo(CodeGenerationContext context, BuilderMethodMode mode) {
         return true;
     }
 
@@ -34,35 +35,38 @@ public abstract class AbstractBuilderMethodContributor<T extends AffordanceTempl
     @Nonnull
     @Override
     public final Stream<ParameterSpec> generateMethodParameters(
-            AffordanceTemplate affordanceTemplate, CodeGenerationContext context) {
-        return doGenerateMethodParameters((T) affordanceTemplate, context);
+            AffordanceTemplate affordanceTemplate, CodeGenerationContext context, BuilderMethodMode mode) {
+        return doGenerateMethodParameters((T) affordanceTemplate, context, mode);
     }
 
 
     @Nonnull
-    protected Stream<ParameterSpec> doGenerateMethodParameters(T affordanceTemplate, CodeGenerationContext context) {
+    protected Stream<ParameterSpec> doGenerateMethodParameters(T affordanceTemplate, CodeGenerationContext context,
+                                                               BuilderMethodMode mode) {
         return Stream.empty();
     }
 
 
     @Nullable
     @Override
-    public final CodeBlock generateCodeBefore(AffordanceTemplate affordanceTemplate, CodeGenerationContext context) {
-        return doGenerateCodeBefore((T) affordanceTemplate, context);
+    public final CodeBlock generateCodeBefore(AffordanceTemplate affordanceTemplate,
+                                              CodeGenerationContext context, BuilderMethodMode mode) {
+        return doGenerateCodeBefore((T) affordanceTemplate, context, mode);
     }
 
 
     @Nullable
-    protected CodeBlock doGenerateCodeBefore(T affordanceTemplate, CodeGenerationContext context) {
+    protected CodeBlock doGenerateCodeBefore(T affordanceTemplate, CodeGenerationContext context,
+                                             BuilderMethodMode mode) {
         return null;
     }
 
 
     @Nullable
     @Override
-    public final CodeBlock generateBuilderSetterStatement(AffordanceTemplate affordanceTemplate,
-                                                          CodeGenerationContext context,
-                                                          String builderVariableName) {
+    public final CodeBlock generateBuilderSetterStatement(
+            AffordanceTemplate affordanceTemplate, CodeGenerationContext context,
+            BuilderMethodMode mode, String builderVariableName) {
         return doGenerateBuilderSetterStatement((T) affordanceTemplate, builderVariableName);
     }
 

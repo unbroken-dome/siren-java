@@ -3,7 +3,9 @@ package org.unbrokendome.siren.ap.codegeneration.type.contributors;
 
 import com.google.auto.service.AutoService;
 import org.unbrokendome.siren.ap.codegeneration.CodeGenerationContext;
+import org.unbrokendome.siren.ap.codegeneration.feature.Feature;
 import org.unbrokendome.siren.ap.codegeneration.method.BuilderMethodContributor;
+import org.unbrokendome.siren.ap.codegeneration.method.contributors.BuilderMethodMode;
 import org.unbrokendome.siren.ap.codegeneration.type.TypeSpecContributor;
 import org.unbrokendome.siren.ap.model.affordance.AffordanceTemplate;
 import org.unbrokendome.siren.ap.model.affordance.grouping.AffordanceGroup;
@@ -20,7 +22,7 @@ public class ExplicitRequestLinkMethodContributor extends AbstractTypeSpecMethod
 
     @Inject
     public ExplicitRequestLinkMethodContributor(Set<BuilderMethodContributor> methodContributors) {
-        super(methodContributors);
+        super(methodContributors, BuilderMethodMode.EXPLICIT_REQUEST);
     }
 
 
@@ -31,13 +33,8 @@ public class ExplicitRequestLinkMethodContributor extends AbstractTypeSpecMethod
 
 
     @Override
-    public boolean appliesTo(AffordanceGroup affordanceGroup) {
-        return affordanceGroup.getKind() == AffordanceGroupKind.LINK;
-    }
-
-
-    @Override
-    protected CodeGenerationContext getCodeGenerationContext() {
-        return CodeGenerationContext.EXPLICIT_REQUEST;
+    public boolean appliesTo(AffordanceGroup affordanceGroup, CodeGenerationContext context) {
+        return affordanceGroup.getKind() == AffordanceGroupKind.LINK &&
+                context.isEnabled(Feature.EXPLICIT_REQUEST);
     }
 }

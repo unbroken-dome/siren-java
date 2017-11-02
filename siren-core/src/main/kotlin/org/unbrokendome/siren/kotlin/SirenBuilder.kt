@@ -13,7 +13,7 @@ protected constructor (protected val builder: B) {
 
     var className: String?
             get() = builder.classNames.firstOrNull()
-            set(value) { builder.setClassName(value) }
+            set(value) { builder.setClassName(requireNotNull(value)) }
 
     var classNames: List<String>
             get() = builder.classNames

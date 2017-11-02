@@ -7,7 +7,7 @@ repositories {
 dependencyManagement {
     
     imports {
-        mavenBom 'org.springframework:spring-framework-bom:4.3.8.RELEASE'
+        mavenBom 'org.springframework:spring-framework-bom:5.0.0.RELEASE'
         mavenBom 'com.google.inject:guice-bom:4.1.0'
     }
 

@@ -1,12 +1,12 @@
 package org.unbrokendome.siren.ap.codegeneration.method;
 
-import org.unbrokendome.siren.ap.codegeneration.CodeGenerationContext;
-import org.unbrokendome.siren.ap.model.affordance.AffordanceTemplate;
 import com.google.common.collect.Ordering;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
-import com.squareup.javapoet.ParameterizedTypeName;
+import org.unbrokendome.siren.ap.codegeneration.CodeGenerationContext;
+import org.unbrokendome.siren.ap.codegeneration.method.contributors.BuilderMethodMode;
+import org.unbrokendome.siren.ap.model.affordance.AffordanceTemplate;
 
 import javax.annotation.Nonnull;
 import javax.lang.model.element.Modifier;
@@ -14,7 +14,6 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 
@@ -24,6 +23,7 @@ public class BuilderMethodCodeGenerator<T extends AffordanceTemplate> {
 
     private final T affordanceTemplate;
     private final CodeGenerationContext context;
+    private final BuilderMethodMode mode;
     private final String methodName;
     private final Type specType;
     private final List<BuilderMethodContributor> contributors;
@@ -33,16 +33,17 @@ public class BuilderMethodCodeGenerator<T extends AffordanceTemplate> {
     public BuilderMethodCodeGenerator(
             T affordanceTemplate,
             CodeGenerationContext context,
-            String methodName,
+            BuilderMethodMode mode, String methodName,
             Type specType,
             Collection<? extends BuilderMethodContributor> contributors) {
         this.affordanceTemplate = affordanceTemplate;
         this.context = context;
+        this.mode = mode;
         this.methodName = methodName;
         this.specType = specType;
 
         this.contributors = contributors.stream()
-                .filter(c -> c.appliesTo(affordanceTemplate, context))
+                .filter(c -> c.appliesTo(affordanceTemplate, context, mode))
                 .collect(Collectors.toList());
     }
 
@@ -62,7 +63,7 @@ public class BuilderMethodCodeGenerator<T extends AffordanceTemplate> {
     @Nonnull
     private Iterable<ParameterSpec> generateParameters() {
         return contributors.stream()
-                .flatMap(c -> c.generateMethodParameters(affordanceTemplate, context))
+                .flatMap(c -> c.generateMethodParameters(affordanceTemplate, context, mode))
                 .collect(Collectors.toList());
     }
 
@@ -71,7 +72,7 @@ public class BuilderMethodCodeGenerator<T extends AffordanceTemplate> {
     private CodeBlock generateCodeBefore() {
         CodeBlock.Builder codeBlock = CodeBlock.builder();
         contributors.stream()
-                .map(c -> c.generateCodeBefore(affordanceTemplate, context))
+                .map(c -> c.generateCodeBefore(affordanceTemplate, context, mode))
                 .filter(code -> code != null && !code.isEmpty())
                 .forEach(codeBlock::add);
         return codeBlock.build();
@@ -80,16 +81,27 @@ public class BuilderMethodCodeGenerator<T extends AffordanceTemplate> {
 
     @Nonnull
     private CodeBlock generateReturnCodeBlock() {
-        CodeBlock.Builder returnCodeBlock = CodeBlock.builder()
-                .add("$[return $1L -> $1L", BUILDER_VAR_NAME)
-                .indent().indent();
+
+        CodeBlock.Builder contributedCodeBuilder = CodeBlock.builder();
         contributors.stream()
-                .map(c -> c.generateBuilderSetterStatement(affordanceTemplate, context, BUILDER_VAR_NAME))
+                .map(c -> c.generateBuilderSetterStatement(affordanceTemplate, context, mode, BUILDER_VAR_NAME))
                 .filter(code -> code != null && !code.isEmpty())
-                .forEach(code -> returnCodeBlock.add("\n").add(code));
-        returnCodeBlock.add(";\n$]")
-                .unindent().unindent();
-        return returnCodeBlock.build();
+                .forEach(code -> contributedCodeBuilder.add("\n").add(code));
+
+        CodeBlock contributedCode = contributedCodeBuilder.build();
+        if (contributedCode.isEmpty()) {
+            return CodeBlock.builder()
+                    .add("$[return $1L -> { };\n$]", BUILDER_VAR_NAME)
+                    .build();
+        } else {
+            return CodeBlock.builder()
+                    .add("$[return $1L -> $1L", BUILDER_VAR_NAME)
+                    .indent().indent()
+                    .add(contributedCode)
+                    .add(";\n$]")
+                    .unindent().unindent()
+                    .build();
+        }
     }
 
 

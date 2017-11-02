@@ -7,25 +7,52 @@ apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
 
+sourceSets {
+    integrationTestSupport {
+        java.srcDirs = [ 'src/integration-test-support/java' ]
+        groovy.srcDirs = [ 'src/integration-test-support/groovy' ]
+        resources.srcDirs = [ 'src/integration-test-support/resources' ]
+    }
+}
+
+configurations {
+    integrationTestSupportImplementation.extendsFrom testImplementation
+    integrationTestSupportRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+
 testSets {
-    integrationTest { dirName = 'integration-test' }
+    integrationTestWebMvc { dirName = 'integration-test-webmvc' }
+    integrationTestWebFlux { dirName = 'integration-test-webflux' }
 }
 
 
 dependencies {
-    compile project(':siren-core')
-    compile project(':siren-spring')
-    compile project(':siren-ap')
+    implementation project(':siren-core')
+    implementation project(':siren-ap')
+
+    implementation 'com.google.inject:guice'
 
     compileOnly 'com.google.auto.service:auto-service'
     apt 'com.google.auto.service:auto-service'
 
-    testCompile 'com.github.javaparser:javaparser-core'
-    testCompile 'com.google.testing.compile:compile-testing'
-    testCompile 'org.springframework:spring-test'
-    testCompile 'org.slf4j:slf4j-api'
-    testRuntime 'ch.qos.logback:logback-classic'
+    testImplementation 'com.github.javaparser:javaparser-core'
+    testImplementation 'com.google.testing.compile:compile-testing'
+    testImplementation 'org.springframework:spring-test'
+    testImplementation 'org.slf4j:slf4j-api'
+    testRuntimeOnly 'ch.qos.logback:logback-classic'
 
-    integrationTestCompile 'org.springframework:spring-webmvc'
-    integrationTestCompileOnly 'com.google.auto.service:auto-service'
+    integrationTestWebMvcImplementation 'javax.servlet:javax.servlet-api'
+    integrationTestWebMvcImplementation 'org.springframework:spring-webmvc'
+    integrationTestWebMvcImplementation sourceSets.integrationTestSupport.output
+    integrationTestWebMvcCompileOnly 'com.google.auto.service:auto-service'
+
+    integrationTestWebFluxImplementation 'org.springframework:spring-webflux'
+    integrationTestWebFluxImplementation sourceSets.integrationTestSupport.output
+    integrationTestWebFluxCompileOnly 'com.google.auto.service:auto-service'
 }
+
+
+task integrationTest(group: 'verification',
+        description: 'Runs all integration tests.',
+        dependsOn: [integrationTestWebMvc, integrationTestWebFlux])

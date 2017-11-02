@@ -1,11 +1,6 @@
 rootProject.name = 'siren-java'
 
-def path = [] as LinkedList
-
-rootDir.traverse(
-        type: groovy.io.FileType.FILES,
-        nameFilter: ~/^build\.gradle$/,
-        excludeNameFilter: 'buildSrc',
-        maxDepth: 3,
-        preDir: { path << it.name },
-        postDir: { path.removeLast() }) { if (path) include path.join(":") }
+include 'siren-ap'
+include 'siren-core'
+include 'siren-java-bom'
+include 'siren-spring-ap'

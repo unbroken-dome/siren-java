@@ -1,6 +1,7 @@
 package org.unbrokendome.siren.ap.codegeneration;
 
 import com.google.inject.multibindings.Multibinder;
+import org.unbrokendome.siren.ap.codegeneration.feature.FeatureVoter;
 import org.unbrokendome.siren.ap.codegeneration.method.BuilderMethodContributor;
 import org.unbrokendome.siren.ap.codegeneration.type.TypeSpecContributor;
 import org.unbrokendome.siren.ap.ExtensionBinder;
@@ -20,6 +21,7 @@ public class CodeGenerationModule extends AbstractModule {
 
         ExtensionBinder.registerExtensionPoints(binder(),
                 TypeSpecContributor.class,
-                BuilderMethodContributor.class);
+                BuilderMethodContributor.class,
+                FeatureVoter.class);
     }
 }
