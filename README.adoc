@@ -36,7 +36,7 @@ Declare a dependency on the `siren-core` JAR in your build tool:
 [source,groovy]
 ----
 dependencies {
-    compile 'org.unbrokendome.siren:siren-core:0.2.0'
+    compile 'org.unbroken-dome.siren:siren-core:0.2.0'
 }
 ----
 
@@ -45,7 +45,7 @@ dependencies {
 ----
 <dependencies>
     <dependency>
-        <groupId>org.unbrokendome.siren</groupId>
+        <groupId>org.unbroken-dome.siren</groupId>
         <artifactId>siren-core</artifactId>
         <version>0.2.0</version>
     </dependency>
@@ -162,8 +162,8 @@ plugins {
 }
 
 dependencies {
-    implementation 'org.unbrokendome.siren:siren-core:0.2.0'
-    apt 'org.unbrokendome.siren:siren-spring-ap:0.2.0'
+    implementation 'org.unbroken-dome.siren:siren-core:0.2.0'
+    apt 'org.unbroken-dome.siren:siren-spring-ap:0.2.0'
 }
 ----
 
@@ -236,7 +236,7 @@ plugins {
 }
 
 dependencies {
-    compile 'org.unbrokendome.siren:siren-core:0.2.0'
-    kapt 'org.unbrokendome.siren:siren-spring-ap:0.2.0'
+    compile 'org.unbroken-dome.siren:siren-core:0.2.0'
+    kapt 'org.unbroken-dome.siren:siren-spring-ap:0.2.0'
 }
 ----
