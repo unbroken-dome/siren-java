@@ -49,4 +49,18 @@ public final class EmbeddedEntity extends FullEntity {
     public int hashCode() {
         return Objects.hash(super.hashCode(), rel);
     }
+
+    @Override
+    public String toString() {
+        return "EmbeddedEntity{" +
+                "rel=" + rel +
+                ", properties=" + getProperties() +
+                ", entities=" + getEntities() +
+                ", links=" + getLinks() +
+                ", actions=" + getActions() +
+                ", classes=" + getClasses() +
+                ", title='" + getTitle() + '\'' +
+                ", customProperties=" + getCustomProperties() +
+                '}';
+    }
 }

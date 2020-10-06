@@ -58,4 +58,15 @@ public abstract class Reference extends Element {
     public int hashCode() {
         return Objects.hash(super.hashCode(), href, type);
     }
+
+    @Override
+    public String toString() {
+        return "Reference{" +
+                "href='" + href + '\'' +
+                ", type='" + type + '\'' +
+                ", classes=" + getClasses() +
+                ", title='" + getTitle() + '\'' +
+                ", customProperties=" + getCustomProperties() +
+                '}';
+    }
 }
