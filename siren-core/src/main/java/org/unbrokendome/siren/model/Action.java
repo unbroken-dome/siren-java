@@ -70,4 +70,18 @@ public final class Action extends Reference {
     public int hashCode() {
         return Objects.hash(super.hashCode(), name, method, fields);
     }
+
+    @Override
+    public String toString() {
+        return "Action{" +
+                "name='" + name + '\'' +
+                ", method='" + method + '\'' +
+                ", fields=" + fields +
+                ", href='" + getHref() + '\'' +
+                ", type='" + getType() + '\'' +
+                ", classes=" + getClasses() +
+                ", title='" + getTitle() + '\'' +
+                ", customProperties=" + getCustomProperties() +
+                '}';
+    }
 }

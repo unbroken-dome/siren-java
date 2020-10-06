@@ -84,4 +84,17 @@ public abstract class FullEntity extends Entity {
         return Objects.hash(super.hashCode(),
                 properties, entities, links, actions);
     }
+
+    @Override
+    public String toString() {
+        return "FullEntity{" +
+                "properties=" + properties +
+                ", entities=" + entities +
+                ", links=" + links +
+                ", actions=" + actions +
+                ", classes=" + getClasses() +
+                ", title='" + getTitle() + '\'' +
+                ", customProperties=" + getCustomProperties() +
+                '}';
+    }
 }

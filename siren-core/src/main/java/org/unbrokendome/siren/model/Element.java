@@ -65,4 +65,13 @@ public abstract class Element implements Serializable {
     public int hashCode() {
         return Objects.hash(classes, title);
     }
+
+    @Override
+    public String toString() {
+        return "Element{" +
+                "classes=" + classes +
+                ", title='" + title + '\'' +
+                ", customProperties=" + customProperties +
+                '}';
+    }
 }

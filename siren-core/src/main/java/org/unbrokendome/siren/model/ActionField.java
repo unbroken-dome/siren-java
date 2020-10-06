@@ -115,4 +115,16 @@ public final class ActionField extends Element {
     public int hashCode() {
         return Objects.hash(super.hashCode(), name, type, value);
     }
+
+    @Override
+    public String toString() {
+        return "ActionField{" +
+                "name='" + name + '\'' +
+                ", type=" + type +
+                ", value=" + value +
+                ", classes=" + getClasses() +
+                ", title='" + getTitle() + '\'' +
+                ", customProperties=" + getCustomProperties() +
+                '}';
+    }
 }

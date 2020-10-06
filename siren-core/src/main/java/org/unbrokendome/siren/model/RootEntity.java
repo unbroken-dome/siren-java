@@ -23,4 +23,17 @@ public final class RootEntity extends FullEntity {
     public static RootEntityBuilder builder() {
         return new RootEntityBuilder();
     }
+
+    @Override
+    public String toString() {
+        return "RootEntity{" +
+                "properties=" + getProperties() +
+                ", entities=" + getEntities() +
+                ", links=" + getLinks() +
+                ", actions=" + getActions() +
+                ", classes=" + getClasses() +
+                ", title='" + getTitle() + '\'' +
+                ", customProperties=" + getCustomProperties() +
+                '}';
+    }
 }

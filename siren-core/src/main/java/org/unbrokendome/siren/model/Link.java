@@ -49,4 +49,16 @@ public final class Link extends Reference {
     public int hashCode() {
         return Objects.hash(super.hashCode(), rel);
     }
+
+    @Override
+    public String toString() {
+        return "Link{" +
+                "rel=" + rel +
+                ", href='" + getHref() + '\'' +
+                ", type='" + getType() + '\'' +
+                ", classes=" + getClasses() +
+                ", title='" + getTitle() + '\'' +
+                ", customProperties=" + getCustomProperties() +
+                '}';
+    }
 }
